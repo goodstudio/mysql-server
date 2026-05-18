@@ -1,0 +1,65 @@
+# .cnb.yml
+.npc: &npc
+  - services:
+      - docker
+    stages:
+      - name: run with npc
+        image: cnbcool/default-npc-agent:latest
+
+好大个:
+  issue.comment@npc: *npc
+  pull_request.comment@npc: *npc
+
+$:
+  vscode:
+    - runner:
+        cpus: 32
+      docker:
+        build: .ide/Dockerfile
+        image: docker.cnb.cool/avwq/cnb.cool/cnb-avwq-default-dev-env-centos-stream:stream10
+      env:
+        # 声明首次打开终端时自动执行的命令，支持多行文本
+        CNB_WELCOME_CMD: |
+          echo "Hello World!"
+          echo done
+      services:
+        - vscode
+        - docker
+      # 开发环境启动后会执行的任务
+      stages:
+        - name: ls
+          script: ls -al
+  tag_push:
+    - stages:
+        - name: 生成 Code Wiki
+          timeout: 4h
+          image: cnbcool/codewiki:latest
+          settings:
+            git_doc_dir: /${CNB_BUILD_WORKSPACE}/${CNB_REPO_SLUG}/codewiki
+
+# .cnb.yml
+"**":  # 触发的分支名，默认所有分支，可按需修改
+  push:  # push 触发，可按需修改为 pull_request 等
+    - stages:
+      # 代码分析
+      - name: TCA
+        timeout: 2h
+        image: cnbcool/tca:latest
+        settings:
+          from_file:  # 可选，可以传递一个文件（比如 changed.txt），内容为需要分析的文件列表，一行一个文件（采用基于工作空间的相对路径）
+          ignore_paths: # 可选，指定一个或多个相对工作空间的文件屏蔽路径(黑名单)，多个路径可写成数组格式，路径采用Unix通配符格式。
+          white_paths: # 可选，指定一个或多个相对工作区的扫描路径(白名单)，多个路径可写成数组格式，路径采用Unix通配符格式。
+          block:  # 可选，默认为true, 如果有代码问题或分析异常，会阻塞流水线。如果不希望阻塞流水线，可以设置为false。
+
+    - stages:
+        - name: build knowledge base
+          image: cnbcool/knowledge-base
+          settings:
+            include: '**/*.md,**/*.mdx,**/*.pdf,**/*.docx,**/*.txt'            
+            issue_sync_enabled: true
+            issue_labels:
+              - bug
+              - feature
+            issue_state: "open"
+            issue_priority: "P0,P1"
+
