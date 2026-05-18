@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-Copyright (c) 1995, 2025, Oracle and/or its affiliates.
+Copyright (c) 1995, 2026, Oracle and/or its affiliates.
 Copyright (c) 2008, 2009 Google Inc.
 Copyright (c) 2009, Percona Inc.
 
@@ -78,6 +78,7 @@ this program; if not, write to the Free Software Foundation, Inc.,
 #include "pars0pars.h"
 #include "que0que.h"
 #include "row0mysql.h"
+#include "sql/sql_class.h"
 #include "sql_thd_internal_api.h"
 #include "srv0mon.h"
 
@@ -3077,6 +3078,9 @@ void srv_purge_coordinator_thread() {
   srv_slot_t *slot;
 
   THD *thd = create_internal_thd();
+
+  // Allow purge in read only mode as well.
+  thd->set_skip_readonly_check();
 
   purge_sys->is_this_a_purge_thread = true;
 
