@@ -13,10 +13,9 @@
 $:
   vscode:
     - runner:
-        cpus: 32
+        cpus: 64
       docker:
         build: .ide/Dockerfile
-        image: docker.cnb.cool/avwq/cnb.cool/cnb-avwq-default-dev-env-centos-stream:stream10
       env:
         # 声明首次打开终端时自动执行的命令，支持多行文本
         CNB_WELCOME_CMD: |

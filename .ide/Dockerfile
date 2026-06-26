@@ -17,6 +17,10 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh \
 # 安装 ssh 服务，用于支持 VSCode 等客户端通过 Remote-SSH 访问开发环境（也可按需安装其他软件）
 RUN dnf update && dnf install -y git wget unzip openssh-server epel-release && dnf install atop btop htop iftop iotop
 
+# 业务安装
+RUN dnf groupinstall "Development Tools" -y && dnf install -y libaio ncurses-compat-libs cmake libaio-devel ncurses-devel openssl-devel bison zlib-devel libcurl-devel rpm-build rpmdevtools xz perl pkgconf-pkg-config
+
+
 # 指定字符集支持命令行输入中文（根据需要选择字符集）
 ENV LANG C.UTF-8
 ENV LANGUAGE C.UTF-8
